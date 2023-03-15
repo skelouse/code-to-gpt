@@ -6,12 +6,11 @@ go install github.com/skelouse/code-to-gpt@latest
 
 ## Usage
 
-First create your prompt which will outline the expectations of chatGPT.  Simply modify the example prompt below to fit your needs, and paste the content of the `send.gpt` file where indicated.
+Create your prompt to outline the expectations of chatGPT.  Simply modify the example prompt below to fit your needs, and paste the content of the `send.gpt` file where indicated.
 
 
 ```shell
 # from inside a project you would like to parse
-
 code-to-gpt
 
 # then copy the contents of `send.gpt` and paste it below the prompt
