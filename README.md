@@ -43,6 +43,10 @@ Here is the content of the "send.gpt" file:
 ```
 
 
+## TODO
 
-
+- [ ] Use urfave/cli for parsing flags
+- [ ] Automatically generate a prompt based on the code using go-survey or take options from flags
+- [ ] Add flag for specifying the prompt directory
+- [ ] Add flag for specifying out filename
 
