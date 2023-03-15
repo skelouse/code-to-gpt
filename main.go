@@ -9,7 +9,11 @@ import (
 	"strings"
 )
 
-var maxRecursions = 20
+var (
+	maxRecursions     = 20
+	ignoreFiles       = []string{"send.gpt"}
+	ignoreDirectories = []string{".git"}
+)
 
 func main() {
 	// Get the current working directory
@@ -50,73 +54,87 @@ func parse(basePath, currentPath string, newFile *os.File, remainingRecursions i
 		path := filepath.Join(currentPath, file.Name())
 
 		if file.IsDir() {
-			err := parse(basePath, path, newFile, remainingRecursions-1)
-			if err != nil {
-				return err
+			if !isIgnoredDirectory(file.Name()) {
+				err := parse(basePath, path, newFile, remainingRecursions-1)
+				if err != nil {
+					return err
+				}
 			}
 		} else {
-			// Skip the "send.gpt" file to avoid writing to itself
-			if file.Name() == "send.gpt" {
-				continue
-			}
-
-			// Get the relative path
-			relPath, err := filepath.Rel(basePath, path)
-			if err != nil {
-				return err
-			}
-
-			// Determine the file extension and the appropriate comment format
-			extension := filepath.Ext(path)
-			comment := ""
-			switch strings.ToLower(extension) {
-			case ".py":
-				comment = "#"
-			case ".js":
-				comment = "//"
-			case ".go":
-				comment = "//"
-			case ".rb":
-				comment = "#"
-			case ".java":
-				comment = "//"
-			case ".c", ".cpp", ".cs":
-				comment = "//"
-			default:
-				comment = "#"
-			}
-
-			// Write 79 dashes between files
-			_, err = newFile.WriteString(strings.Repeat("-", 79) + "\n")
-			if err != nil {
-				return err
-			}
-
-			// Write the comment with the relative path to the "send.gpt" file
-			_, err = newFile.WriteString(fmt.Sprintf("%s %s\n", comment, relPath))
-			if err != nil {
-				return err
-			}
-
-			// Open the file
-			srcFile, err := os.Open(path)
-			if err != nil {
-				return err
-			}
-			defer srcFile.Close()
-
-			// Write the contents of the file to the "send.gpt" file
-			_, err = io.Copy(newFile, srcFile)
-			if err != nil {
-				return err
-			}
-
-			// Add a newline after the contents
-			_, err = newFile.WriteString("\n")
-			if err != nil {
-				return err
+			if !isIgnoredFile(file.Name()) {
+				err = writeFileContents(basePath, path, newFile)
+				if err != nil {
+					return err
+				}
 			}
 		}
+	}
+
+	return nil
+}
+
+func isIgnoredFile(filename string) bool {
+	for _, ignoreFile := range ignoreFiles {
+		if filename == ignoreFile {
+			return true
+		}
+	}
+	return false
+}
+
+func isIgnoredDirectory(directoryName string) bool {
+	for _, ignoreDir := range ignoreDirectories {
+		if directoryName == ignoreDir {
+			return true
+		}
+	}
+	return false
+}
+
+func writeFileContents(basePath, path string, newFile *os.File) error {
+	relPath, err := filepath.Rel(basePath, path)
+	if err != nil {
+		return err
+	}
+
+	extension := filepath.Ext(path)
+	comment := ""
+	switch strings.ToLower(extension) {
+	case ".js", ".go", ".java", ".c", ".cpp", ".cs":
+		comment = "//"
+	default:
+		comment = "#"
+	}
+
+	// Write 79 dashes between files
+	_, err = newFile.WriteString(strings.Repeat("-", 79) + "\n")
+	if err != nil {
+		return err
+	}
+
+	// Write the comment with the relative path to the "send.gpt" file
+	_, err = newFile.WriteString(fmt.Sprintf("%s %s\n", comment, relPath))
+	if err != nil {
+		return err
+	}
+
+	// Open the file
+	srcFile, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+
+	// Write the contents of the file to the "send.gpt" file
+	_, err = io.Copy(newFile, srcFile)
+	if err != nil {
+		return err
+	}
+
+	// Add a newline after the contents
+	_, err = newFile.WriteString("\n")
+	if err != nil {
+		return err
 	}
 
 	return nil
