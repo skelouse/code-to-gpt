@@ -1,3 +1,7 @@
+# code-to-gpt
+
+`code-to-gpt` is a Go program that reads the contents of the current working directory and its subdirectories up to a maximum recursion depth of 20. The program writes the relative path of each file as a comment, followed by the file's content, to multiple files named "send1-3.gpt", "send2-3.gpt", and "send3-3.gpt" (representing 1 out of 3, 2 out of 3, and 3 out of 3, respectively). This tool is useful for analyzing and discussing code projects with AI language models like OpenAI's ChatGPT.
+
 ## Installation
 
 ```shell
@@ -6,40 +10,34 @@ go install github.com/skelouse/code-to-gpt@latest
 
 ## Usage
 
-Create your prompt to outline the expectations of chatGPT.  Simply modify the example prompt below to fit your needs, and paste the content of the `send.gpt` file where indicated.
+1. Change to the directory you would like to analyze
+2. Run `code-to-gpt`
+3. Locate the generated `send*-*.gpt` files in the `sendGPT` directory
+4. Paste the contents of each file into a separate message to chatGPT
+5. Once chatGPT has learned the contents of the final file it will provide a list of options for further actions
+6. Respond to chatGPT with the number of the option you would like to discuss, or simply respond with what you would like to have done
 
 
-```shell
-# from inside a project you would like to parse
-code-to-gpt
-
-# then copy the contents of `send.gpt` and paste it below the prompt
-```
-
-### Example prompt
+### Example Session
 
 ```
-// Quick summary of the code
+<content of send*-*.gpt sent in separate messages>
+```
 
-I have a Go program that reads the contents of the current working directory and its subdirectories up to a maximum recursion depth of 20. The program writes the relative path of each file as a comment, followed by the file's content, to a file named "send.gpt".
+Response:
+```
+learned
 
-// Explain what is about to happen
+Based on the contents of the provided files, here are some options for further actions:
 
-I will paste the contents of the generated "send.gpt" file below. Please review the code and provide any suggestions, improvements, or modifications.
-
-// Fill out check boxes for what you would like done, and add a new one if it is not listed.
-
-[ ] Refactor the code
-[ ] Summarize the code
-[X] Optimize performance
-[ ] Identify potential bugs
-[ ] Suggest better naming conventions
-[ ] Provide additional error handling
-[ ] Suggest additional features
-
-Here is the content of the "send.gpt" file:
-
-<content of send.gpt>
+Refactor the code
+Summarize the code
+Optimize performance
+Identify potential bugs
+Suggest better naming conventions
+Provide additional error handling
+Suggest additional features
+...
 ```
 
 
@@ -49,4 +47,3 @@ Here is the content of the "send.gpt" file:
 - [ ] Automatically generate a prompt based on the code using go-survey or take options from flags
 - [ ] Add flag for specifying the prompt directory
 - [ ] Add flag for specifying out filename
-
