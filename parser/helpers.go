@@ -17,6 +17,14 @@ func isIgnoredFile(filename string) bool {
 			return true
 		}
 	}
+
+	fileExt := filepath.Ext(filename)
+	for _, ignoreExt := range IgnoreExt {
+		if fileExt == ignoreExt {
+			return true
+		}
+	}
+
 	return false
 }
 
@@ -26,6 +34,7 @@ func isIgnoredDirectory(directoryName string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 

@@ -1,0 +1,46 @@
+
+
+sendGPT/send2-2.gpt (last-file)
+
+ error handling
+Suggest additional features
+Please wait for the content of each file to be pasted before responding. Remember to only respond with "learned" after each file is pasted, and provide the list of options after learning the contents of the final file marked with "(last-file)".
+-------------------------------------------------------------------------------
+// prompts/vars.go 
+package prompts
+
+import (
+	_ "embed"
+	"strings"
+)
+
+var (
+	//go:embed initial.md
+	InitialPrompt          string
+	LastFileSuffix         = " (last-file)\n\n"
+	IntermediateFileSuffix = ` (please, don't forget the original prompt, respond with "learned".)` + "\n\n"
+	FileSeparator          = strings.Repeat("-", 79) + "\n"
+)
+
+-------------------------------------------------------------------------------
+# super-diff.sh 
+# This file is provided free of charge and may be modified and used by anyone. While I appreciate any improvements through pull requests to https://github.com/skelouse/code-to-gpt, they are not required. I hold no liability for any issues arising from the use of this script.
+
+if test "$#" = 0; then
+    (
+        added_files=()
+        git ls-files --others --exclude-standard |
+            while read -r i; do
+                git add --intent-to-add "$i"
+                added_files+=("$i")
+            done
+        git diff --no-color
+
+        # Revert the --intent-to-add
+        for i in "${added_files[@]}"; do
+            git reset "$i"
+        done
+    )
+else
+    git diff "$@"
+fi

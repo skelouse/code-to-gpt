@@ -6,5 +6,6 @@ var (
 	ToSendDirName     = "sendGPT"
 	MashFileName      = "mash.gpt"
 	IgnoreFiles       = []string{MashFileName}
+	IgnoreExt         = []string{".png", ".jpg"}
 	IgnoreDirectories = []string{".git", ToSendDirName}
 )
