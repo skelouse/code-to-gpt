@@ -92,7 +92,7 @@ func writeFileContents(basePath, path string, newFile *os.File) error {
 	return nil
 }
 
-func splitMashFile(mashFile *os.File) error {
+func splitMashFile(mashFile *os.File, withPrompt bool) error {
 	fileInfo, err := mashFile.Stat()
 	if err != nil {
 		return fmt.Errorf("getting mash file information: %s", err)
@@ -115,7 +115,7 @@ func splitMashFile(mashFile *os.File) error {
 		}
 		defer outputFile.Close()
 
-		if i == 1 {
+		if i == 1 && withPrompt {
 			_, err = outputFile.WriteString(prompts.InitialPrompt)
 			if err != nil {
 				return fmt.Errorf("writing initial prompt: %s", err)
@@ -139,6 +139,33 @@ func splitMashFile(mashFile *os.File) error {
 		if err != nil {
 			return fmt.Errorf("writing output file: %s", err)
 		}
+	}
+
+	return nil
+}
+
+func writeMashFile(mashFile *os.File, withPrompt bool) error {
+	outputFilename := fmt.Sprintf("%s/send.gpt", ToSendDirName)
+	outputFile, err := os.Create(outputFilename)
+	if err != nil {
+		return fmt.Errorf("creating output file: %s", err)
+	}
+	defer outputFile.Close()
+
+	if withPrompt {
+		_, err = outputFile.WriteString(prompts.InitialPrompt)
+		if err != nil {
+			return fmt.Errorf("writing initial prompt: %s", err)
+		}
+	}
+
+	data, err := io.ReadAll(mashFile)
+	if err != nil {
+		return fmt.Errorf("reading mashFile failed with: %s", err)
+	}
+	_, err = outputFile.Write(data)
+	if err != nil {
+		return fmt.Errorf("writing to outputFile(%s) failed with: %s", outputFilename, err)
 	}
 
 	return nil
