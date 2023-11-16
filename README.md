@@ -2,6 +2,10 @@
 
 `code-to-gpt` is a Go program that reads the contents of the current working directory and its subdirectories up to a maximum recursion depth of 20. The program writes the relative path of each file as a comment, followed by the file's content, to multiple files named "send1-3.gpt", "send2-3.gpt", and "send3-3.gpt" (representing 1 out of 3, 2 out of 3, and 3 out of 3, respectively). This tool is useful for analyzing and discussing code projects with AI language models like OpenAI's ChatGPT.
 
+## Simple `code-to-gpt -c` example
+
+[code-to-gpt-ex.webm](https://github.com/skelouse/code-to-gpt/assets/42463301/842eca5d-f6d4-4dd3-b89f-c8b6503cb7bb)
+
 ## Installation
 
 ```shell
