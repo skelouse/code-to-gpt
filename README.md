@@ -14,51 +14,22 @@ go install github.com/skelouse/code-to-gpt@latest
 
 ## Usage
 
-1. Change to the directory you would like to analyze.
-2. Run `code-to-gpt` with the necessary flags:
-   - `--with-prompt`: Includes an initial prompt.
-   - `--split-files` or `-s`: Splits the codebase into multiple files if it is too large for a single file.
-   - `--clipboard` or `-c`: Copies the output to the clipboard. Note: this flag does not work with `--split-files`.
-3. Locate the generated `send*.gpt` files in the `sendGPT` directory, or if you used the clipboard flag, simply paste from the clipboard.
-4. Paste the contents of each file into a separate message to ChatGPT.
-5. Once ChatGPT has learned the contents of the final file, it will provide a list of options for further actions.
-6. Respond to ChatGPT with the number of the option you would like to discuss, or simply respond with what you would like to have done.
+1. Run `code-to-gpt`
+2. Paste into chat.
+3. ???
+4. Write great code.
 
 ### Example Session
 
 ```shell
 # Command with new flags
-code-to-gpt --with-prompt --split-files
+code-to-gpt --split-files
 
 # Or if you want to copy the output to the clipboard
-code-to-gpt --clipboard
+code-to-gpt --c
 
 ```
-<content of send*-*.gpt sent in separate messages>
 
-#### `--with-prompt`
-
-```
-learned
-
-Based on the contents of the provided files, here are some options for further actions:
-
-1. Refactor the code
-2. Summarize the code
-3. Optimize performance
-4. Identify potential bugs
-5. Suggest better naming conventions
-6. Provide additional error handling
-7. Suggest additional features
-...
-```
-
-## TODO
-
-- [ ] Use urfave/cli for parsing flags
-- [ ] Automatically generate a prompt based on the code using go-survey or take options from flags
-- [ ] Add flag for specifying the prompt directory
-- [ ] Add flag for specifying out filename
 
 ## Super Diff
 

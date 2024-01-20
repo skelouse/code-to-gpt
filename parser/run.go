@@ -9,7 +9,6 @@ import (
 )
 
 type Options struct {
-	WithPrompt bool
 	SplitFiles bool
 	Clipboard  bool
 }
@@ -65,12 +64,12 @@ func Run(opts Options) error {
 
 	if opts.SplitFiles {
 		// Split the mash file into smaller files to be consumed by chat bot
-		err = splitMashFile(mashFile, opts.WithPrompt)
+		err = splitMashFile(mashFile)
 		if err != nil {
 			return fmt.Errorf("splitting mash file: %s", err)
 		}
 	} else {
-		err = writeMashFile(mashFile, opts.WithPrompt)
+		err = writeMashFile(mashFile)
 		if err != nil {
 			return err
 		}

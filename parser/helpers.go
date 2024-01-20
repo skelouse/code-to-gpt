@@ -92,7 +92,7 @@ func writeFileContents(basePath, path string, newFile *os.File) error {
 	return nil
 }
 
-func splitMashFile(mashFile *os.File, withPrompt bool) error {
+func splitMashFile(mashFile *os.File) error {
 	fileInfo, err := mashFile.Stat()
 	if err != nil {
 		return fmt.Errorf("getting mash file information: %s", err)
@@ -115,22 +115,7 @@ func splitMashFile(mashFile *os.File, withPrompt bool) error {
 		}
 		defer outputFile.Close()
 
-		if i == 1 && withPrompt {
-			_, err = outputFile.WriteString(prompts.InitialPrompt)
-			if err != nil {
-				return fmt.Errorf("writing initial prompt: %s", err)
-			}
-		}
-
-		var toWriteFileName string
-		if i == numFiles {
-			toWriteFileName = outputFilename + prompts.LastFileSuffix
-		} else {
-			// Have to be nice to the overlords
-			toWriteFileName = outputFilename + prompts.IntermediateFileSuffix
-		}
-
-		_, err = outputFile.WriteString("\n\n" + toWriteFileName)
+		_, err = outputFile.WriteString(outputFilename + "\n\n")
 		if err != nil {
 			return fmt.Errorf("writing output file name: %s", err)
 		}
@@ -144,20 +129,13 @@ func splitMashFile(mashFile *os.File, withPrompt bool) error {
 	return nil
 }
 
-func writeMashFile(mashFile *os.File, withPrompt bool) error {
+func writeMashFile(mashFile *os.File) error {
 	outputFilename := fmt.Sprintf("%s/send.gpt", ToSendDirName)
 	outputFile, err := os.Create(outputFilename)
 	if err != nil {
 		return fmt.Errorf("creating output file: %s", err)
 	}
 	defer outputFile.Close()
-
-	if withPrompt {
-		_, err = outputFile.WriteString(prompts.InitialPrompt)
-		if err != nil {
-			return fmt.Errorf("writing initial prompt: %s", err)
-		}
-	}
 
 	data, err := io.ReadAll(mashFile)
 	if err != nil {

@@ -14,9 +14,6 @@ func main() {
 	cmd := &cli.Command{
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
-				Name: "with-prompt",
-			},
-			&cli.BoolFlag{
 				Name:    "split-files",
 				Aliases: []string{"s"},
 			},
@@ -29,7 +26,6 @@ func main() {
 		Action: func(ctx *cli.Context) error {
 			return parser.Run(parser.Options{
 				SplitFiles: ctx.Bool("split-files"),
-				WithPrompt: ctx.Bool("with-prompt"),
 				Clipboard:  ctx.Bool("clipboard"),
 			})
 		},
