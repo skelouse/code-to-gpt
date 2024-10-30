@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/atotto/clipboard v0.1.4
+	github.com/bmatcuk/doublestar/v4 v4.7.1
 	github.com/urfave/cli/v3 v3.0.0-alpha4
 )
 

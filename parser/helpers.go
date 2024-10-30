@@ -8,12 +8,15 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bmatcuk/doublestar/v4"
 	"github.com/skelouse/code-to-gpt/prompts"
 )
 
-func isIgnoredFile(filename string) bool {
+func isIgnoredFile(relativePath string, opts Options) bool {
+	filename := filepath.Base(relativePath)
+
 	for _, ignoreFile := range IgnoreFiles {
-		if filename == ignoreFile {
+		if filename == ignoreFile || relativePath == ignoreFile {
 			return true
 		}
 	}
@@ -25,21 +28,76 @@ func isIgnoredFile(filename string) bool {
 		}
 	}
 
-	return false
-}
+	// Then, check exclude patterns
+	for _, pattern := range opts.Exclude {
+		if relativePath == pattern {
+			return true
+		}
 
-func isIgnoredDirectory(directoryName string) bool {
-	for _, ignoreDir := range IgnoreDirectories {
-		if directoryName == ignoreDir {
+		matched, err := doublestar.Match(pattern, relativePath)
+		if err != nil {
+			continue
+		}
+		if matched {
 			return true
 		}
 	}
 
+	// Then, check include patterns
+	if len(opts.Include) > 0 {
+		for _, pattern := range opts.Include {
+			if relativePath == pattern {
+				return false
+			}
+
+			matched, err := doublestar.Match(pattern, relativePath)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error matching pattern '%s' with path '%s': %v\n", pattern, relativePath, err)
+				continue
+			}
+			if matched {
+				return false
+			}
+		}
+		return true
+	}
+
+	// Otherwise, include the file
+	return false
+}
+
+func isIgnoredDirectory(relativePath string, opts Options) bool {
+	dirName := filepath.Base(relativePath)
+
+	// First, check hard ignores
+	for _, ignoreDir := range IgnoreDirectories {
+		if dirName == ignoreDir || relativePath == ignoreDir {
+			return true
+		}
+	}
+
+	// Then, check exclude patterns
+	for _, pattern := range opts.Exclude {
+		if relativePath == pattern {
+			return true
+		}
+
+		matched, err := doublestar.Match(pattern, relativePath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error matching pattern '%s' with path '%s': %v\n", pattern, relativePath, err)
+			continue
+		}
+		if matched {
+			return true
+		}
+	}
+
+	// Otherwise, include the directory
 	return false
 }
 
 func writeFileContents(basePath, path string, newFile *os.File) error {
-	relPath, err := filepath.Rel(basePath, path)
+	relativePath, err := filepath.Rel(basePath, path)
 	if err != nil {
 		return err
 	}
@@ -65,7 +123,7 @@ func writeFileContents(basePath, path string, newFile *os.File) error {
 	}
 
 	// Write the comment with the relative path to the "mash.gpt" file
-	_, err = newFile.WriteString(fmt.Sprintf("%s %s %s\n", commentPrefix, relPath, commentSuffix))
+	_, err = newFile.WriteString(fmt.Sprintf("%s %s %s\n", commentPrefix, relativePath, commentSuffix))
 	if err != nil {
 		return err
 	}
