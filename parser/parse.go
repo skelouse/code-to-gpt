@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-func parse(basePath, currentPath string, newFile *os.File, remainingRecursions int) error {
+func parse(opts Options, basePath, currentPath string, newFile *os.File, remainingRecursions int) error {
 	// Return if the recursion limit has been reached
 	if remainingRecursions == 0 {
 		return nil
@@ -21,15 +21,20 @@ func parse(basePath, currentPath string, newFile *os.File, remainingRecursions i
 	for _, file := range files {
 		path := filepath.Join(currentPath, file.Name())
 
+		relativePath, err := filepath.Rel(basePath, path)
+		if err != nil {
+			return err
+		}
+
 		if file.IsDir() {
-			if !isIgnoredDirectory(file.Name()) {
-				err := parse(basePath, path, newFile, remainingRecursions-1)
+			if !isIgnoredDirectory(relativePath, opts) {
+				err := parse(opts, basePath, path, newFile, remainingRecursions-1)
 				if err != nil {
 					return err
 				}
 			}
 		} else {
-			if !isIgnoredFile(file.Name()) {
+			if !isIgnoredFile(relativePath, opts) {
 				err = writeFileContents(basePath, path, newFile)
 				if err != nil {
 					return err

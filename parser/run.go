@@ -11,6 +11,8 @@ import (
 type Options struct {
 	SplitFiles bool
 	Clipboard  bool
+	Include    []string
+	Exclude    []string
 }
 
 func Run(opts Options) error {
@@ -38,7 +40,7 @@ func Run(opts Options) error {
 		}
 	}()
 
-	err = parse(cwd, cwd, mashFile, MaxRecursions)
+	err = parse(opts, cwd, cwd, mashFile, MaxRecursions)
 	if err != nil {
 		return fmt.Errorf("parsing files: %s", err)
 	}
