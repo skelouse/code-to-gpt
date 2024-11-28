@@ -13,6 +13,7 @@ type Options struct {
 	Clipboard  bool
 	Include    []string
 	Exclude    []string
+	Quiet      bool
 }
 
 func Run(opts Options) error {
@@ -40,7 +41,15 @@ func Run(opts Options) error {
 		}
 	}()
 
-	err = parse(opts, cwd, cwd, mashFile, MaxRecursions)
+	filesProcessed := new([]string)
+	err = parse(ParseOptions{
+		baseOptions:         opts,
+		basePath:            cwd,
+		currentPath:         cwd,
+		newFile:             mashFile,
+		remainingRecursions: MaxRecursions,
+		filesProcessed:      filesProcessed,
+	})
 	if err != nil {
 		return fmt.Errorf("parsing files: %s", err)
 	}
@@ -56,27 +65,51 @@ func Run(opts Options) error {
 			return fmt.Errorf("splitting mash file: %s", err)
 		}
 
-		return clipboard.WriteAll(string(data))
-	}
-
-	// Create the file directory
-	if err := os.MkdirAll(ToSendDirName, os.ModePerm); err != nil {
-		return fmt.Errorf("creating send directory: %s", err)
-	}
-
-	if opts.SplitFiles {
-		// Split the mash file into smaller files to be consumed by chat bot
-		err = splitMashFile(mashFile)
+		err = clipboard.WriteAll(string(data))
 		if err != nil {
-			return fmt.Errorf("splitting mash file: %s", err)
+			return fmt.Errorf("writing to clipboard: %s", err)
 		}
+
+	} else { // Write to sendGPT directory
+		// Create the file directory
+		if err := os.MkdirAll(ToSendDirName, os.ModePerm); err != nil {
+			return fmt.Errorf("creating send directory: %s", err)
+		}
+
+		if opts.SplitFiles {
+			// Split the mash file into smaller files to be consumed by chat bot
+			err = splitMashFile(mashFile)
+			if err != nil {
+				return fmt.Errorf("splitting mash file: %s", err)
+			}
+		} else {
+			err = writeMashFile(mashFile)
+			if err != nil {
+				return err
+			}
+
+		}
+	}
+
+	if opts.Quiet {
+		return nil
+	}
+
+	// Build the tree and print it
+	root := buildTree(*filesProcessed)
+	printTree(root, "", true)
+
+	// Print counts
+	_, fileCount := countNodes(root)
+
+	message := ""
+	if opts.Clipboard {
+		message = "copied to clipboard"
 	} else {
-		err = writeMashFile(mashFile)
-		if err != nil {
-			return err
-		}
-
+		message = "written to ./sendGPT/"
 	}
+
+	fmt.Printf("\n%d files %s\n", fileCount, message)
 
 	return nil
 }

@@ -22,6 +22,11 @@ func main() {
 				Usage:   "does not work with split-files",
 				Aliases: []string{"c"},
 			},
+			&cli.BoolFlag{
+				Name:    "quiet",
+				Usage:   "silences success and tree printout",
+				Aliases: []string{"q"},
+			},
 			&cli.StringSliceFlag{
 				Name:  "include",
 				Usage: "Include files matching glob patterns",
@@ -48,6 +53,7 @@ func main() {
 				Clipboard:  ctx.Bool("clipboard"),
 				Include:    ctx.StringSlice("include"),
 				Exclude:    ctx.StringSlice("exclude"),
+				Quiet:      ctx.Bool("quiet"),
 			})
 		},
 	}
