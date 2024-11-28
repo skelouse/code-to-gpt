@@ -13,6 +13,7 @@ type Options struct {
 	Clipboard  bool
 	Include    []string
 	Exclude    []string
+	Quiet      bool
 }
 
 func Run(opts Options) error {
@@ -88,6 +89,10 @@ func Run(opts Options) error {
 			}
 
 		}
+	}
+
+	if opts.Quiet {
+		return nil
 	}
 
 	// Build the tree and print it
