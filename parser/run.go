@@ -14,6 +14,7 @@ type Options struct {
 	Include    []string
 	Exclude    []string
 	Quiet      bool
+	MaxSize    int64
 }
 
 func Run(opts Options) error {

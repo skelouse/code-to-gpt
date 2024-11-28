@@ -14,10 +14,6 @@ func main() {
 	cmd := &cli.Command{
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
-				Name:    "split-files",
-				Aliases: []string{"s"},
-			},
-			&cli.BoolFlag{
 				Name:    "clipboard",
 				Usage:   "does not work with split-files",
 				Aliases: []string{"c"},
@@ -34,6 +30,15 @@ func main() {
 			&cli.StringSliceFlag{
 				Name:  "exclude",
 				Usage: "Exclude files matching glob patterns",
+			},
+			&cli.IntFlag{
+				Name:  "max-size",
+				Usage: "Maximum total size of files to process (in bytes)",
+				Value: 2 * 1024 * 1024, // Default to 2MB
+			},
+			&cli.BoolFlag{
+				Name:    "split-files",
+				Aliases: []string{"s"},
 			},
 		},
 		Action: func(ctx *cli.Context) error {
@@ -54,6 +59,7 @@ func main() {
 				Include:    ctx.StringSlice("include"),
 				Exclude:    ctx.StringSlice("exclude"),
 				Quiet:      ctx.Bool("quiet"),
+				MaxSize:    ctx.Int("max-size"),
 			})
 		},
 	}
