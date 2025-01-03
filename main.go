@@ -24,12 +24,14 @@ func main() {
 				Aliases: []string{"q"},
 			},
 			&cli.StringSliceFlag{
-				Name:  "include",
-				Usage: "Include files matching glob patterns",
+				Name:    "include",
+				Usage:   "Include files matching glob patterns",
+				Aliases: []string{"i"},
 			},
 			&cli.StringSliceFlag{
-				Name:  "exclude",
-				Usage: "Exclude files matching glob patterns",
+				Name:    "exclude",
+				Usage:   "Exclude files matching glob patterns",
+				Aliases: []string{"e"},
 			},
 			&cli.IntFlag{
 				Name:  "max-size",
